@@ -1,0 +1,23 @@
+{
+  "name": "kapstone-backend",
+  "version": "1.0.0",
+  "description": "An Express API for our kapstone project",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv-safe": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.10.0",
+    "mongoose": "^5.12.3",
+    "socket.io": "^4.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "nodemon": "^2.0.7"
+  }
+}
