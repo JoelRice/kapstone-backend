@@ -50,8 +50,8 @@ module.exports = {
       return;
     }
     // ASCII + symbols check
-    if (!/^[a-zA-Z0-9[~`!@#$%^&*()_+{}|[\]\\:";'<>?,./]+]$/.test(req.body.password)) {
-      res.status(400).json({ error: 'Username may only contain numbers, letters, and regular symbols' });
+    if (!/^[a-zA-Z0-9~`!@#$%^&*()_+{}|[\]\\:";'<>?,./]+$/.test(req.body.password)) {
+      res.status(400).json({ error: 'Password may only contain numbers, letters, and regular symbols' });
       return;
     }
     next();

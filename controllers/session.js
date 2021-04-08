@@ -45,7 +45,7 @@ module.exports = {
       token: req.body.token,
     }).then((session) => {
       if (session === null) {
-        throw 'Could not log out: not logged in';
+        throw 'You must be logged in to log out';
       }
       res.locals.session = session;
       next();
