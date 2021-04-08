@@ -7,7 +7,7 @@ const responses = require('./responses');
 const check = require('./validators');
 
 // Each endpoint calls
-// One or more parsers
+// One or more validators
 // One or more controllers
 // then finally a response handler
 
@@ -32,8 +32,8 @@ router.route('/auth/account')
   .delete(
     // check.token,
     // check.password,
-    session.deleteByToken,
     user.deleteByToken,
+    session.deleteByToken,
     responses.account.deleted,
   );
 
