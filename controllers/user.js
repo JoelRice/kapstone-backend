@@ -1,10 +1,11 @@
 const User = require('../models/User');
 const Session = require('../models/Session');
-const errors = require('../handlers/errors');
+const ErrorChain = require('../handlers/errors');
 
 module.exports = {
-  /** Create as a user via req.body, sets locals
-   * @body username, password
+  /** Create as a user if it doesn't already exist
+   * @body username
+   * @body password
    * @locals user
    */
   create: (req, res, next) => {
@@ -15,15 +16,19 @@ module.exports = {
       res.locals.user = user;
       next();
     }).catch((err) => {
-      errors.process(err, res,
-        [ errors.dupe, 'Someone already has that username' ],
-        errors.database,
-        errors.standard,
-      );
+      new ErrorChain(err, res)
+        .dupe('Someone already has that name')
+        .database()
+        .standard();
     });
   },
 
-  deleteByToken: (req, res, next) => {
+  /** Delete a user
+   * @body token
+   * @body password
+   * @locals user
+   */
+  delete: (req, res, next) => {
     Session.findOne({
       token: req.body.token,
     }).then((session) => {
@@ -40,7 +45,9 @@ module.exports = {
       res.locals.user = user;
       next();
     }).catch((err) => {
-      res.status(400).json({ error: err });
+      new ErrorChain(err, res)
+        .database()
+        .standard();
     });
   },
 };

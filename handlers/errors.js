@@ -1,38 +1,40 @@
-module.exports = {
-  /** Process errors to output error messages
-   * @param {Any} err Error from .catch()
-   * @param {Any} res Express result object
-   * @param {<Array, Function>} errorFuncs Ex: errors.standard OR [errors.standard, 'An output message']
+class ErrorChain {
+  constructor(err, res) {
+    this.err = err;
+    this.res = res;
+    this.done = false;
+  }
+
+  /** 409/param when a duplicate is detected
    */
-  process: (err, res, ...errorFuncs) => {
-    for (let af of errorFuncs) {
-      if (af instanceof Array) {
-        if (af[0](err, res, ...af.slice(1))) return;
-      }
-      else {
-        if (af(err, res)) return;
-      }
-    }
-  },
-  dupe: (err, res, onDuplicate='That already exists') => {
-    if (typeof err === 'object' && err.code === 11000) {
-      res.status(409).json({ error: onDuplicate });
-      return true;
+  dupe(message='That already exists') {
+    if (!this.done && typeof this.err === 'object' && this.err.code === 11000) {
+      this.res.status(409).json({ error: message });
+      this.done = true;
     }    
-    return false;
-  },
-  database: (err, res) => {
-    if (typeof err === 'object') {
-      res.status(400).json({ error: 'An unknown database error ocurred' });
-      console.log(err);
+    return this;
+  }
+
+  /** 400/Unknown database error
+   */
+  database() {
+    if (!this.done && typeof this.err === 'object') {
+      this.res.status(400).json({ error: 'An unknown database error ocurred' });
+      console.log(this.err);
+      this.done = true;
     }
-    return false;
-  },
-  standard: (err, res) => {
-    if (err) {
-      res.status(400).json({ error: err });
-      return true;
+    return this;
+  }
+
+  /** 400/err
+   */
+  standard() {
+    if (!this.done && this.err) {
+      this.res.status(400).json({ error: this.err });
+      this.done = true;
     }
-    return false;
-  },
-};
+    return this;
+  }
+}
+
+module.exports = ErrorChain;
