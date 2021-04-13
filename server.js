@@ -37,6 +37,11 @@ server.use((req, res, next) => {
 // Create endpoints
 server.use(require('./handlers/endpoints'));
 
+// Fallback
+server.use((req, res) => {
+  res.status(404).send({ error: 'Incorrect endpoint or request method' });
+});
+
 server.listen(PORT, () => {
   console.log(`Express running on port ${PORT}`);
 });

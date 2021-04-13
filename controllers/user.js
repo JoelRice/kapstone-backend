@@ -3,6 +3,27 @@ const Session = require('../models/Session');
 const ErrorChain = require('../handlers/errors');
 
 module.exports = {
+  /** Get info about the user you're logged in as
+   * @body token
+   * @locals user
+   */
+  get: (req, res, next) => {
+    Session.findOne({
+      token: req.body.token,
+    }).then((session) => {
+      if (session === null) {
+        throw 'Invalid token';
+      }
+      return User.findById(session.user);
+    }).then((user) => {
+      res.locals.user = user;
+      next();
+    }).catch((err) => {
+      new ErrorChain(err)
+        .database()
+        .standard();
+    });
+  },
   /** Create as a user if it doesn't already exist
    * @body username
    * @body password
@@ -12,6 +33,8 @@ module.exports = {
     User.create({
       username: req.body.username,
       password: req.body.password,
+      isAdmin: false,
+      balance: 500,
     }).then((user) => {
       res.locals.user = user;
       next();

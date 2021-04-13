@@ -9,6 +9,14 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isAdmin: {
+    type: Boolean,
+    required: true,
+  },
+  balance: {
+    type: Number,
+    required: true,
+  },
 });
 
 const User = mongoose.model('User', schema);
