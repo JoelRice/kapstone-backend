@@ -12,6 +12,8 @@ module.exports = {
     User.create({
       username: req.body.username,
       password: req.body.password,
+      isAdmin: false,
+      balance: 500,
     }).then((user) => {
       res.locals.user = user;
       next();
