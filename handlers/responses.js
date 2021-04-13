@@ -1,5 +1,13 @@
 module.exports = {
   account: {
+    /** 200/None
+     * @locals username
+     */
+    read: (req, res) => {
+      res.status(200).json({
+        username: res.locals.user.username,
+      });
+    },
     /** 201/Account created
      */
     created: (req, res) => {
@@ -17,7 +25,7 @@ module.exports = {
   },
   session: {  
     /** 201/Logged in
-     * @reqLocal session
+     * @locals session
      */
     created: (req, res) => {
       res.status(201).json({

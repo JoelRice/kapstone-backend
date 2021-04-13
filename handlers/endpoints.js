@@ -21,6 +21,12 @@ const check = require('./validators');
 // the response body and a message
 
 router.route('/auth/account')
+  // Get info about your account
+  .get(
+    check.token,
+    user.get,
+    responses.account.read,
+  )
   // Create a new account
   .post(
     check.username,
