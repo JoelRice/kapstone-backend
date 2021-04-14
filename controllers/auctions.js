@@ -6,10 +6,17 @@ const Session = require('../models/Session');
 const User = require('../models/User');
 
 module.exports = {
+  /** Get all pet ids
+  */
+  all: (req, res) => {
+    Auction.find().then((foundAuctions) => {
+      res.status(200).json(foundAuctions.map((auction) => auction._id));
+    }).catch(errors.standard(res));
+  },
   /** Find all relevant info about an auction
    * @params id
    */
-  find: (req, res) => {
+  read: (req, res) => {
     Auction.findById(req.params.id)
       .then((foundAuction) => {
         errors.inline.badResource(foundAuction);

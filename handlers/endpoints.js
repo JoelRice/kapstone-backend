@@ -5,6 +5,7 @@ const check = require('./validators');
 const users = require('../controllers/users');
 const sessions = require('../controllers/sessions');
 const auctions = require('../controllers/auctions');
+const pets = require('../controllers/pets');
 
 const tokenGen = require('../tokenGenerator');
 
@@ -16,7 +17,7 @@ router.route('/auth/account')
   // Get info about your account
   .get(
     check.body('token'),
-    users.read,
+    sessions.read,
   )
   // Create a new account
   .post(
@@ -66,11 +67,16 @@ router.route('/admin/auction')
     auctions.create,
   );
 
-router.route('/auction/:id')
+router.route('/auctions')
+  .get(
+    auctions.all,
+  );
+
+router.route('/auctions/:id')
   // Get all the info on an auction
   .get(
     check.params('id', 'mongoId'),
-    auctions.find,
+    auctions.read,
   )
   // Place a bid on an auction
   .post(
@@ -78,6 +84,28 @@ router.route('/auction/:id')
     check.body('token'),
     check.body('amount'),
     auctions.update,
+  );
+
+router.route('/pets')
+  .get(
+    pets.all,
+  );
+
+router.route('/pets/:id')
+  .get(
+    check.params('id', 'mongoId'),
+    pets.read,
+  );
+
+router.route('/users')
+  .get(
+    users.all,
+  );
+
+router.route('/users/:id')
+  .get(
+    check.params('id', 'mongoId'),
+    users.read,
   );
 
 module.exports = router;

@@ -6,6 +6,23 @@ const Session = require('../models/Session');
 const tokenGen = require('../tokenGenerator');
 
 module.exports = {
+  /** Read a user via session
+   * @body token
+   */
+  read: (req, res) => {
+    Session.findOne({
+      token: req.body.token,
+    }).then((foundSession) => {
+      errors.inline.badToken(foundSession);
+      return User.findById(foundSession.user);
+    }).then((user) => {
+      res.status(200).json({
+        username: user.username,
+        balance: user.balance,
+        isAdmin: user.isAdmin,
+      });
+    }).catch(errors.standard(res));
+  },
   /** Create a session
    * @body username
    * @body password

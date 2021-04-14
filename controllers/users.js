@@ -5,19 +5,21 @@ const Session = require('../models/Session');
 
 module.exports = {
   /** Read a user
-   * @body token
+   * @param id
    */
   read: (req, res) => {
-    Session.findOne({
-      token: req.body.token,
-    }).then((foundSession) => {
-      errors.inline.badToken(foundSession);
-      return User.findById(foundSession.user);
-    }).then((user) => {
-      res.status(200).json({ username: user.username, balance: user.balance });
+    User.findById(req.params.id).then((foundUser) => {
+      errors.inline.badResource(foundUser);
+      res.status(200).json({ username: foundUser.username, balance: foundUser.balance });
     }).catch(errors.standard(res));
   },
-
+  /** Get all users ids
+   */
+  all: (req, res) => {
+    User.find().then((foundUsers) => {
+      res.status(200).json(foundUsers.map((user) => user._id));
+    }).catch(errors.standard(res));
+  },
   /** Create a user
    * @body username
    * @body password
