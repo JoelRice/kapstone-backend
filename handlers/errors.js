@@ -55,8 +55,17 @@ module.exports = {
     new ErrorChain(err, res).customStatus().defaultStatus().databaseDupe(message).database();
   },
   inline: {
+    badResource: (any) => {
+      if (any === null) throw [404, 'That page does not exist'];
+    },
     badToken: (session) => {
       if (session === null) throw [400, 'Invalid token'];
+    },
+    badPermission: (user) => {
+      if (!user.isAdmin) throw [403, 'You are not authorized to use this endpoint'];
+    },
+    badBalance: (user, amount) => {
+      if (user.balance < amount) throw [400, 'You do not have enough funds'];
     },
     badPassword: (user, password) => {
       if (user === null || user.password !== password) throw [400, 'Incorrect password'];

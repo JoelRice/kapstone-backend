@@ -10,6 +10,11 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  },
   traits: {
     cuddly: {
       type: Number,
