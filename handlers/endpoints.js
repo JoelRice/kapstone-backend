@@ -1,63 +1,56 @@
 const router = require('express').Router();
 
-const user = require('../controllers/user');
-const session = require('../controllers/session');
-
-const responses = require('./responses');
 const check = require('./validators');
 
-// Each endpoint calls
-// One or more validators
-// One or more controllers
-// then finally a response handler
+const users = require('../controllers/users');
+const sessions = require('../controllers/sessions');
+
+const tokenGen = require('../tokenGenerator');
 
 // Validators read 'req.body' to check
-// its formatting and provide useful
-// errors.
-
-// Controllers create properties on 'res.locals'
-
-// Response handlers use those properties to output
-// the response body and a message
+// its formatting and provide useful errors.
+// Then the request gets passed on to the CRUD controller
 
 router.route('/auth/account')
   // Get info about your account
   .get(
-    check.token,
-    user.get,
-    responses.account.read,
+    check.body('token'),
+    users.read,
   )
   // Create a new account
   .post(
-    check.username,
-    check.password,
-    user.create,
-    responses.account.created,
+    check.body('username'),
+    check.body('password'),
+    users.create,
   )
-  // Delete your session token and its account
+  // Update your account
+  .put(
+    check.body('token'),
+    check.body('password'),
+    check.body('newUsername', 'username'),
+    check.body('newPassword', 'password'),
+    users.update,
+  )
+  // Delete your account
   .delete(
-    check.token,
-    check.password,
-    user.delete,
-    session.delete,
-    responses.account.deleted,
+    check.body('token'),
+    check.body('password'),
+    users.delete,
   );
 
 router.route('/auth/login')
   // Log in to your account, creating a session token
   .post(
-    check.username,
-    check.password,
-    session.create,
-    responses.session.created,
+    check.body('username'),
+    check.body('password'),
+    sessions.create,
   );
 
 router.route('/auth/logout')
   // Log out of your account, deleting your session token
   .post(
-    check.token,
-    session.delete,
-    responses.session.deleted,
+    check.body('token'),
+    sessions.delete,
   );
 
 module.exports = router;

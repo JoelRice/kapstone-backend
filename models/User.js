@@ -19,6 +19,16 @@ const schema = new mongoose.Schema({
   },
 });
 
+// Cleanup functions
+schema.pre('remove', { document: true, query: false }, function(next) {
+  mongoose.model('Session').deleteMany({ user: this._id }, next);
+});
+
+// Mainly for findByIdAndDelete which is really findOneAndDelete so I used a regex
+schema.pre(/.*delete.*/i, { document: false, query: true }, function(next) {
+  mongoose.model('Session').deleteMany({ user: this._conditions._id }, next);
+});
+
 const User = mongoose.model('User', schema);
 
 module.exports = User;
