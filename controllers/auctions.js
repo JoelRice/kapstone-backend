@@ -5,6 +5,8 @@ const Pet = require('../models/Pet');
 const Session = require('../models/Session');
 const User = require('../models/User');
 
+const timeouts = require('../handlers/timeouts');
+
 module.exports = {
   /** Get all pet ids
   */
@@ -55,6 +57,7 @@ module.exports = {
         endsAt: new Date(req.body.endsAt),
       });
     }).then((createdAuction) => {
+      timeouts.schedule('auction', createdAuction);
       res.status(201).json({
         message: 'Auction successfully created',
         auction: createdAuction._id,
@@ -88,6 +91,35 @@ module.exports = {
       return foundAuction.save();
     }).then((updatedAuction) => {
       res.status(200).json({ message: 'Bid successfully placed', amount: req.body.amount });
+    }).catch(errors.standard(res));
+  },
+  /** Delete an auction and distribute its rewards
+   * @params id
+   */
+  delete: (req, res) => {
+    let auction = null;
+    let winner = null;
+    Auction.findByIdAndDelete(req.params.id).then((deletedAuction) => {
+      auction = deletedAuction;
+      winner = deletedAuction.bids.reduce(
+        (highest, bid) => bid.amount > highest.amount ? bid : highest,
+        { user: null, amount: 0 }
+      );
+      if (winner.user === null) {
+        Auction.create({
+          pet: auction.pet,
+          endsAt: new Date(auction.endsAt.getTime() + 1000 * 60 * 60 * 6),
+        }).then((createdAuction) => {
+          timeouts.schedule('auction', createdAuction);
+        });
+        throw [200, 'Failed to close auction, no one has bid. It has been extended by 6 hours.'];
+      }      
+      return User.findById(winner.user);
+    }).then((foundUser) => {
+      foundUser.balance -= winner.amount;
+      return Pet.findByIdAndUpdate(auction.pet, { owner: winner.user });
+    }).then((updatedPet) => {
+      res.status(200).json({ message: 'Auction closed successfully' });
     }).catch(errors.standard(res));
   },
 };

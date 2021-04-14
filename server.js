@@ -41,10 +41,13 @@ server.use((req, res, next) => {
 // Create endpoints
 server.use(require('./handlers/endpoints'));
 
-// Fallback
+// Fallback on no endpoint
 server.use((req, res) => {
   res.status(404).send({ error: 'Incorrect endpoint or request method' });
 });
+
+// Create timeouts
+require('./handlers/timeouts').init();
 
 server.listen(PORT, () => {
   console.log(`Express running on port ${PORT}`);
