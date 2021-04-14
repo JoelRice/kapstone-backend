@@ -8,7 +8,11 @@ const server = express();
 server.use(express.json());
 
 // Connect to database
-mongoose.connect(DATABASE);
+mongoose.connect(DATABASE, {
+  useFindAndModify: false,
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+});
 
 mongoose.connection.on('connected', () => {
   console.log('MongoDB Connected');

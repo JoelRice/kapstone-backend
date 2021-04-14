@@ -12,6 +12,10 @@ const schema = new mongoose.Schema({
   },  
 });
 
+schema.pre('save', function(next) {
+  mongoose.model('Session').deleteMany({ user: this.user }, next);
+});
+
 const Session = mongoose.model('Session', schema);
 
 module.exports = Session;
