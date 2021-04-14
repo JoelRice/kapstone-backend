@@ -1,6 +1,7 @@
 const errors = require('../handlers/errors');
 
 const User = require('../models/User');
+const Pets = require('../models/User');
 const Session = require('../models/Session');
 
 module.exports = {
@@ -8,9 +9,23 @@ module.exports = {
    * @param id
    */
   read: (req, res) => {
+    let user = null;
     User.findById(req.params.id).then((foundUser) => {
       errors.inline.badResource(foundUser);
-      res.status(200).json({ username: foundUser.username, balance: foundUser.balance });
+      if (foundUser.isAdmin) {
+        res.status(200).json({ username: foundUser.username });
+        return;
+      }
+      user = foundUser;
+      return Pets.find({
+        owner: foundUser._id,
+      });
+    }).then((foundPets) => {
+      res.status(200).json({
+        username: user.username,
+        balance: user.balance,
+        pets: foundPets.map((pet) => pet._id),
+      });
     }).catch(errors.standard(res));
   },
   /** Get all users ids
