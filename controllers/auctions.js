@@ -90,7 +90,7 @@ module.exports = {
       });
       return foundAuction.save();
     }).then((updatedAuction) => {
-      res.status(200).json({ message: 'Bid successfully placed', amount: req.body.amount });
+      res.status(201).json({ message: `Bid successfully placed for ${req.body.amount}` });
     }).catch(errors.standard(res));
   },
   /** Delete an auction and distribute its rewards

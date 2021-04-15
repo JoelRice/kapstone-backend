@@ -6,6 +6,7 @@ const users = require('../controllers/users');
 const sessions = require('../controllers/sessions');
 const auctions = require('../controllers/auctions');
 const pets = require('../controllers/pets');
+const products = require('../controllers/products');
 
 const tokenGen = require('../tokenGenerator');
 
@@ -106,6 +107,26 @@ router.route('/users/:id')
   .get(
     check.params('id', 'mongoId'),
     users.read,
+  );
+
+router.route('/products')
+  .get(
+    check.optional('').query('filter', 'productCategory'),
+    check.optional('quality').query('sort', 'productSort'),
+    check.optional('asc').query('order'),
+    products.all,
+  );
+
+router.route('/products:name')
+  .get(
+    check.params('name', 'productName'),
+    products.read,
+  )
+  .post(
+    check.params('name', 'productName'),
+    check.body('token'),
+    check.body('quantity', 'amount'),
+    products.create,
   );
 
 module.exports = router;

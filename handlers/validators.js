@@ -99,34 +99,60 @@ const validators = {
       return true;
     }
   },
+  productCategory: (req, res, source, key) => {
+    const options = ['', 'petting', 'resting', 'eating', 'playing'];
+    if (!options.includes(req[source][key])) {
+      res.status(400).json({ error: `Request ${source}.${key} must be one of (${options.slice(1).join('|')})` });
+      return true;
+    }
+  },
+  productSort: (req, res, source, key) => {
+    const options = ['quality', 'price'];
+    if (!options.includes(req[source][key])) {
+      res.status(400).json({ error: `Request ${source}.${key} must be one of (${options.join('|')})` });
+      return true;
+    }
+  },
+  productName: (req, res, source, key) => {
+    // Letters check
+    if (!/^[a-z-]+$/.test(req[source][key])) {
+      res.status(400).json({ error: 'Requested product name should match a format like "feather-wand"' });
+      return true;
+    }
+  },
+  order: (req, res, source, key) => {
+    const options = ['asc', 'desc'];
+    if (!options.includes(req[source][key])) {
+      res.status(400).json({ error: `Request ${source}.${key} must be one of (${options.join('|')})` });
+      return true;
+    }
+  },
+};
+
+const validate = (prop, fallback) => (key, type=key) => {
+  if (!exists(validators, type)) {
+    throw `Validator not implemented for ${type}`;
+  }
+  return (req, res, next) => {  
+    if (!exists(req[prop], key)) {
+      if (fallback !== undefined) req[prop][key] = fallback;
+      else {
+        res.status(400).json({ error: `Request ${prop}.${key} was not provided` });
+        return;
+      }
+    }
+    if (validators[type](req, res, prop, key)) return;
+    next();
+  };
 };
 
 module.exports = {
-  body: (key, type=key) => {
-    if (!exists(validators, type)) {
-      throw `Validator not implemented for ${type}`;
-    }
-    return (req, res, next) => {
-      
-      if (!exists(req.body, key)) {
-        res.status(400).json({ error: `Request body.${key} was not provided` });
-        return;
-      }
-      if (validators[type](req, res, 'body', key)) return;
-      next();
-    };
-  },
-  params: (key, type=key) => {
-    if (!exists(validators, type)) {
-      throw `Validator not implemented for ${type}`;
-    }
-    return (req, res, next) => {  
-      if (!exists(req.params, key)) {
-        res.status(400).json({ error: `Request params.${key} was not provided` });
-        return;
-      }
-      if (validators[type](req, res, 'params', key)) return;
-      next();
-    };
-  },
+  body: validate('body'),
+  params: validate('params'),
+  query: validate('query'),
+  optional: (fallback) => ({
+    body: validate('body', fallback),
+    params: validate('params', fallback),
+    query: validate('query', fallback),
+  })
 };

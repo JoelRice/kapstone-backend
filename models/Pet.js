@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
     required: true,
   },
   pictureData: {
-    type: String,
+    type: Buffer,
     required: true,
   },
   owner: {

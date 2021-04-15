@@ -1,4 +1,23 @@
 const mongoose = require('mongoose');
+const intRange = (lower, upper, x) => Math.max(lower, Math.min(upper, Math.floor(x)));
+
+const Item = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  quality: {
+    type: Number,
+    required: true,
+    set: (value) => intRange(1, 3, value),
+  },
+  category: {
+    type: String,
+    required: true,
+    enum: ['petting', 'resting', 'eating', 'playing'],
+  },
+});
+
 const schema = new mongoose.Schema({
   username: {
     type: String,
@@ -16,6 +35,9 @@ const schema = new mongoose.Schema({
   balance: {
     type: Number,
     required: true,
+  },
+  inventory: {
+    type: [Item],
   },
 });
 

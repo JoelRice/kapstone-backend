@@ -11,7 +11,7 @@ module.exports = {
     }).catch(errors.standard(res));
   },
   /** Read a pet
-   * @param id
+   * @params id
    */
   read: (req, res) => {
     Pet.findById(req.params.id).then((foundPet) => {
