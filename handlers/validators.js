@@ -94,8 +94,8 @@ const validators = {
       return true;
     }
     // Amount check
-    if (req[source][key] < 0) {
-      res.status(400).json({ error: 'Amount must be positive' });
+    if (req[source][key] < 0 || req[source][key] % 1 !== 0) {
+      res.status(400).json({ error: `${key[0].toUpperCase() + key.slice(1).toLowerCase()} must be whole and positive` });
       return true;
     }
   },

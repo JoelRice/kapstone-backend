@@ -1,6 +1,8 @@
 const errors = require('../handlers/errors');
 
 const Pet = require('../models/Pet');
+const Session = require('../models/Session');
+const User = require('../models/User');
 
 module.exports = {
   /** Get all pet ids
@@ -31,6 +33,35 @@ module.exports = {
           tired: foundPet.stats.tired,
           trusting: foundPet.stats.trusting,
         },
+      });
+    }).catch(errors.standard(res));
+  },
+
+  /** Create a new pet
+   * @body token
+   * @body name
+   * @body pictureData
+   * @body traits
+   * @body stats
+   */
+  create: (req, res) => {
+    Session.findOne({
+      token: req.body.token,
+    }).then((foundSession) => {
+      errors.inline.badToken(foundSession);
+      return User.findById(foundSession.user);
+    }).then((foundUser) => {
+      errors.inline.badPermission(foundUser);
+      return Pet.create({
+        name: req.body.name,
+        pictureData: req.body.pictureData,
+        traits: req.body.traits,
+        stats: req.body.stats,
+      });
+    }).then((createdPet) => {
+      res.status(201).json({
+        message: 'Pet successfully created',
+        auction: createdPet._id,
       });
     }).catch(errors.standard(res));
   },

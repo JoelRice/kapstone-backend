@@ -36,7 +36,7 @@ module.exports = {
       });
     }).catch(errors.standard(res));
   },
-  /** Get an individual product by id
+  /** Buy a quantity of products
    * @params name
    * @body token
    * @body quantity
@@ -67,6 +67,36 @@ module.exports = {
       foundUser.save();
     }).then((updatedUser) => {
       res.status(201).json({ message: `Successfully purchased ${req.body.quality}x ${product.name}` });
+    }).catch(errors.standard(res));
+  },
+  /** Make a new product for the store
+   * @body token
+   * @body name
+   * @body pictureData
+   * @body quality
+   * @body category
+   * @body price
+   */
+  createType: (req, res) => {
+    Session.findOne({
+      token: req.body.token,
+    }).then((foundSession) => {
+      errors.inline.badToken(foundSession);
+      return User.findById(foundSession.user);
+    }).then((foundUser) => {
+      errors.inline.badPermission(foundUser);
+      return Product.create({
+        name: req.body.name,
+        pictureData: req.body.pictureData,
+        quality: req.body.quality,
+        category: req.body.category,
+        price: req.body.price,        
+      });
+    }).then((createdProduct) => {
+      res.status(201).json({
+        message: 'Product successfully created',
+        product: createdProduct._id,
+      });
     }).catch(errors.standard(res));
   },
 };

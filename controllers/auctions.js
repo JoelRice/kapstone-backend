@@ -29,32 +29,27 @@ module.exports = {
         });
       }).catch(errors.standard);
   },
-  /** Create a new pet and an auction for it
+  /** Create an auction for a pet
    * @body token
-   * @body name
-   * @body pictureData
-   * @body traits
-   * @body stats
+   * @body pet
    * @body endsAt
    */
   create: (req, res) => {
+    let user = null;
     Session.findOne({
       token: req.body.token,
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);
     }).then((foundUser) => {
-      errors.inline.badPermission(foundUser);
-      return Pet.create({
-        name: req.body.name,
-        pictureData: req.body.pictureData,
-        traits: req.body.traits,
-        stats: req.body.stats,
-      });
-    }).then((createdPet) => {
+      user = foundUser;
+      return Pet.findOneById(req.body.pet);
+    }).then((foundPet) => {
+      errors.inline.badResource(foundPet);
+      errors.inline.badOwner(user, foundPet);
       return Auction.create({
-        pet: createdPet._id,
-        endsAt: new Date(req.body.endsAt),
+        pet: foundPet._id,
+        endsAt: req.body.endsAt,
       });
     }).then((createdAuction) => {
       timeouts.schedule('auction', createdAuction);

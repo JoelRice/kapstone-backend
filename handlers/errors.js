@@ -64,6 +64,9 @@ module.exports = {
     badPermission: (user) => {
       if (!user.isAdmin) throw [403, 'You are not authorized to use this endpoint'];
     },
+    badOwner: (user, pet) => {
+      if (!user.isAdmin && user._id !== pet.owner) throw [403, 'You do not own this pet'];
+    },
     badBalance: (user, amount) => {
       if (user.balance < amount) throw [400, 'You do not have enough funds'];
     },

@@ -56,21 +56,38 @@ router.route('/auth/logout')
     sessions.delete,
   );
 
-router.route('/admin/auction')
-  // Create a new auction
+router.route('/admin/product')
+  // Create a new product in the store
+  .post(
+    check.body('token'),
+    check.body('name'),
+    check.body('pictureData'),
+    check.body('quality', 'amount'),
+    check.body('category', 'productCategory'),
+    check.body('price', 'amount'),
+    products.createType,
+  );
+
+router.route('/admin/pet')
+  // Create a new pet
   .post(
     check.body('token'),
     check.body('name'),
     check.body('pictureData'),
     check.body('traits'),
     check.body('stats'),
-    check.body('endsAt', 'date'),
-    auctions.create,
+    pets.create,
   );
 
 router.route('/auctions')
   .get(
     auctions.all,
+  )
+  .post(
+    check.body('token'),
+    check.body('pet', 'mongoId'),
+    check.body('endsAt', 'date'),
+    auctions.create,
   );
 
 router.route('/auctions/:id')
