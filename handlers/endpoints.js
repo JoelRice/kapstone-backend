@@ -134,7 +134,7 @@ router.route('/products')
     products.all,
   );
 
-router.route('/products:name')
+router.route('/products/:name')
   .get(
     check.params('name', 'productName'),
     products.read,

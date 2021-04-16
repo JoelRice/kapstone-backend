@@ -5,6 +5,7 @@ const schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   pictureData: {
     type: Buffer,

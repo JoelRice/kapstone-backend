@@ -17,7 +17,7 @@ module.exports = {
       let products = foundProducts;
       const sorter = (sortProp, order) => (a, b) => ( (a[sortProp] - b[sortProp]) * (order === 'asc' ? 1 : -1) );
       products.sort(sorter(req.query.sort, req.query.order));
-      res.status(200).json({ products: products.map((product) => product._id) });
+      res.status(200).json({ products: products.map((product) => product.name) });
     }).catch(errors.standard(res));
   },
   /** Get an individual product by name
@@ -25,7 +25,7 @@ module.exports = {
    */
   read: (req, res) => {
     Product.findOne({
-      name: req.params.name.split('-').map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase()).join(''),
+      name: req.params.name,
     }).then((foundProduct) => {
       errors.inline.badResource(foundProduct);
       res.status(200).json({
@@ -97,6 +97,6 @@ module.exports = {
         message: 'Product successfully created',
         product: createdProduct._id,
       });
-    }).catch(errors.standard(res));
+    }).catch(errors.dupes(res, 'This product name already exists'));
   },
 };

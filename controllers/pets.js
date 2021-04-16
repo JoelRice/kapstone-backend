@@ -61,7 +61,7 @@ module.exports = {
     }).then((createdPet) => {
       res.status(201).json({
         message: 'Pet successfully created',
-        auction: createdPet._id,
+        pet: createdPet._id,
       });
     }).catch(errors.standard(res));
   },
