@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const multipartForm = require('multer')().none();
 
 const check = require('./validators');
 
@@ -9,6 +10,7 @@ const pets = require('../controllers/pets');
 const products = require('../controllers/products');
 
 const tokenGen = require('../tokenGenerator');
+const { next } = require('../tokenGenerator');
 
 // Validators read 'req.body' to check
 // its formatting and provide useful errors.
@@ -71,11 +73,16 @@ router.route('/admin/product')
 router.route('/admin/pet')
   // Create a new pet
   .post(
+    multipartForm,
+    //(req, res, next) => { console.log(req.body); next(); },
     check.body('token'),
     check.body('name'),
     check.body('pictureData'),
-    check.body('traits'),
-    check.body('stats'),
+    check.body('cuddly', 'amount'),
+    check.body('lazy', 'amount'),
+    check.body('hungry', 'amount'),
+    check.body('playful', 'amount'),
+    check.body('loyal', 'amount'),
     pets.create,
   );
 

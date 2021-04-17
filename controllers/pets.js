@@ -26,7 +26,7 @@ module.exports = {
           cuddly: foundPet.traits.cuddly,
           lazy: foundPet.traits.lazy,
           hungry: foundPet.traits.hungry,
-          energetic: foundPet.traits.energetic,
+          playful: foundPet.traits.playful,
           loyal: foundPet.traits.loyal,
         },
         stats: {
@@ -55,8 +55,17 @@ module.exports = {
       return Pet.create({
         name: req.body.name,
         pictureData: req.body.pictureData,
-        traits: req.body.traits,
-        stats: req.body.stats,
+        traits: {
+          cuddly: req.body.cuddly,
+          lazy: req.body.lazy,
+          hungry: req.body.hungry,
+          playful: req.body.playful,
+          loyal: req.body.loyal,
+        },
+        stats: {
+          tired: 1,
+          trusting: 1,
+        },
       });
     }).then((createdPet) => {
       res.status(201).json({

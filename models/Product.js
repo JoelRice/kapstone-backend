@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
     unique: true,
   },
   pictureData: {
-    type: Buffer,
+    type: String,
     required: true,
   },
   quality: {

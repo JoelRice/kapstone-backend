@@ -30,7 +30,7 @@ server.use((req, res, next) => {
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
   });
 
-  if (req.get('Content-Type') !== undefined && req.get('Content-Type') !== 'application/json') {
+  if (!req.path.includes('/admin') && req.get('Content-Type') !== undefined && req.get('Content-Type') !== 'application/json') {
     res.status(400).json({ error: '\'Content-Type\' header should be \'application/json\'' });
     return;
   }

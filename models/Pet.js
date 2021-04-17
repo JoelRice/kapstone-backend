@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
     required: true,
   },
   pictureData: {
-    type: Buffer,
+    type: String,
     required: true,
   },
   owner: {
@@ -31,7 +31,7 @@ const schema = new mongoose.Schema({
       required: true,
       set: (value) => intRange(1, 5, value),
     },
-    energetic: {
+    playful: {
       type: Number,
       required: true,
       set: (value) => intRange(1, 5, value),

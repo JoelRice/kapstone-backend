@@ -48,32 +48,6 @@ const validators = {
   pictureData: (req, res, source, key) => {
     // TODO: FIGURE OUT WHAT IT LOOKS LIKE
   },
-  traits: (req, res, source, key) => {
-    const traitList = ['cuddly', 'lazy', 'hungry', 'energetic', 'loyal'];
-    for (let trait of traitList) {
-      if (!exists(req[source].traits, trait)) {
-        res.status(400).json({ error: `Request ${source}.${key}.${trait} was not provided` });
-        return true;
-      }
-      if (typeof req[source].traits[trait] !== 'number') {
-        res.status(400).json({ error: `Request ${source}.${key}.${trait} must be a Number` });
-        return true;
-      }
-    }
-  },
-  stats: (req, res, source, key) => {
-    const statList = ['tired', 'trusting'];
-    for (let stat of statList) {
-      if (!exists(req[source].stats, stat)) {
-        res.status(400).json({ error: `Request ${source}.${key}.${stat} was not provided` });
-        return true;
-      }
-      if (typeof req[source].stats[stat] !== 'number') {
-        res.status(400).json({ error: `Request ${source}.${key}.${stat} must be a Number` });
-        return true;
-      }
-    }
-  },
   date: (req, res, source, key) => {
     if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/.test(req[source][key])| new Date(req[source][key]).toString() === 'Invalid Date') {
       res.status(400).json({ error: `Request ${source}.${key} must be a proper Datestring (Use ISO 8601)` });
@@ -88,13 +62,8 @@ const validators = {
     }
   },
   amount: (req, res, source, key) => {
-    // Type check
-    if (typeof req[source][key] !== 'number') {
-      res.status(400).json({ error: `Request ${source}.${key} must be a Number` });
-      return true;
-    }
     // Amount check
-    if (req[source][key] < 0 || req[source][key] % 1 !== 0) {
+    if (Number(req[source][key]) < 0 || Number(req[source][key]) % 1 !== 0) {
       res.status(400).json({ error: `${key[0].toUpperCase() + key.slice(1).toLowerCase()} must be whole and positive` });
       return true;
     }
