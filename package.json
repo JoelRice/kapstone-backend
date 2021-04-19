@@ -4,7 +4,7 @@
   "description": "An Express API for our kapstone project",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -12,6 +12,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.10.0",
     "mongoose": "^5.12.3",
+    "multer": "^1.4.2",
     "socket.io": "^4.0.1"
   },
   "devDependencies": {

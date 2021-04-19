@@ -30,7 +30,7 @@ server.use((req, res, next) => {
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
   });
 
-  if (req.get('Content-Type') !== undefined && req.get('Content-Type') !== 'application/json') {
+  if (!req.path.includes('/admin') && req.get('Content-Type') !== undefined && req.get('Content-Type') !== 'application/json') {
     res.status(400).json({ error: '\'Content-Type\' header should be \'application/json\'' });
     return;
   }
@@ -41,10 +41,13 @@ server.use((req, res, next) => {
 // Create endpoints
 server.use(require('./handlers/endpoints'));
 
-// Fallback
+// Fallback on no endpoint
 server.use((req, res) => {
   res.status(404).send({ error: 'Incorrect endpoint or request method' });
 });
+
+// Create timeouts
+require('./handlers/timeouts').init();
 
 server.listen(PORT, () => {
   console.log(`Express running on port ${PORT}`);

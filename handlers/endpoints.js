@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const multipartForm = require('multer')().none();
 
 const check = require('./validators');
 
@@ -6,8 +7,10 @@ const users = require('../controllers/users');
 const sessions = require('../controllers/sessions');
 const auctions = require('../controllers/auctions');
 const pets = require('../controllers/pets');
+const products = require('../controllers/products');
 
 const tokenGen = require('../tokenGenerator');
+const { next } = require('../tokenGenerator');
 
 // Validators read 'req.body' to check
 // its formatting and provide useful errors.
@@ -55,21 +58,43 @@ router.route('/auth/logout')
     sessions.delete,
   );
 
-router.route('/admin/auction')
-  // Create a new auction
+router.route('/admin/product')
+  // Create a new product in the store
   .post(
     check.body('token'),
     check.body('name'),
     check.body('pictureData'),
-    check.body('traits'),
-    check.body('stats'),
-    check.body('endsAt', 'date'),
-    auctions.create,
+    check.body('quality', 'amount'),
+    check.body('category', 'productCategory'),
+    check.body('price', 'amount'),
+    products.createType,
+  );
+
+router.route('/admin/pet')
+  // Create a new pet
+  .post(
+    multipartForm,
+    //(req, res, next) => { console.log(req.body); next(); },
+    check.body('token'),
+    check.body('name'),
+    check.body('pictureData'),
+    check.body('cuddly', 'amount'),
+    check.body('lazy', 'amount'),
+    check.body('hungry', 'amount'),
+    check.body('playful', 'amount'),
+    check.body('loyal', 'amount'),
+    pets.create,
   );
 
 router.route('/auctions')
   .get(
     auctions.all,
+  )
+  .post(
+    check.body('token'),
+    check.body('pet', 'mongoId'),
+    check.body('endsAt', 'date'),
+    auctions.create,
   );
 
 router.route('/auctions/:id')
@@ -106,6 +131,26 @@ router.route('/users/:id')
   .get(
     check.params('id', 'mongoId'),
     users.read,
+  );
+
+router.route('/products')
+  .get(
+    check.optional('').query('filter', 'productCategory'),
+    check.optional('quality').query('sort', 'productSort'),
+    check.optional('asc').query('order'),
+    products.all,
+  );
+
+router.route('/products/:name')
+  .get(
+    check.params('name', 'productName'),
+    products.read,
+  )
+  .post(
+    check.params('name', 'productName'),
+    check.body('token'),
+    check.body('quantity', 'amount'),
+    products.create,
   );
 
 module.exports = router;

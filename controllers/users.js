@@ -1,7 +1,7 @@
 const errors = require('../handlers/errors');
 
 const User = require('../models/User');
-const Pets = require('../models/User');
+const Pet = require('../models/Pet');
 const Session = require('../models/Session');
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
         return;
       }
       user = foundUser;
-      return Pets.find({
+      return Pet.find({
         owner: foundUser._id,
       });
     }).then((foundPets) => {
