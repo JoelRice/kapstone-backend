@@ -47,6 +47,7 @@ const extractDate = (type, object) => ({
 const events = {
   auction: (id) => {
     // Inline require to avoid circular dependencies
+    console.log(`Running: auction event (${id})`);
     callController({ id: id }, {}, require('../controllers/auctions').delete);
   },
 };

@@ -27,7 +27,7 @@ module.exports = {
           endsAt: foundAuction.endsAt,
           bids: foundAuction.bids.map((bid) => ({ user: bid.user, amount: bid.amount })),
         });
-      }).catch(errors.standard);
+      }).catch(errors.standard(res));
   },
   /** Create an auction for a pet
    * @body token
@@ -43,7 +43,7 @@ module.exports = {
       return User.findById(foundSession.user);
     }).then((foundUser) => {
       user = foundUser;
-      return Pet.findOneById(req.body.pet);
+      return Pet.findById(req.body.pet);
     }).then((foundPet) => {
       errors.inline.badResource(foundPet);
       errors.inline.badOwner(user, foundPet);
@@ -64,7 +64,7 @@ module.exports = {
    * @body token
    * @body amount
    */
-  update: (req, res) => {
+  bid: (req, res) => {
     let userId = null;
     Session.findOne({
       token: req.body.token,
@@ -79,6 +79,7 @@ module.exports = {
       userId = updatedUser._id;
       return Auction.findById(req.params.id);
     }).then((foundAuction) => {
+      errors.inline.badResource(foundAuction);
       foundAuction.bids.push({
         user: userId,
         amount: req.body.amount
@@ -109,9 +110,14 @@ module.exports = {
         });
         throw [200, 'Failed to close auction, no one has bid. It has been extended by 6 hours.'];
       }      
-      return User.findById(winner.user);
-    }).then((foundUser) => {
-      foundUser.balance -= winner.amount;
+      return User.findById(auction.pet.owner);
+    }).then((foundOwner) => {
+      if (foundOwner !== null) {
+        foundOwner.balance += winner.amount;
+        return foundOwner.save();
+      }
+      return null;
+    }).then((updatedOwner) => {
       return Pet.findByIdAndUpdate(auction.pet, { owner: winner.user });
     }).then((updatedPet) => {
       res.status(200).json({ message: 'Auction closed successfully' });

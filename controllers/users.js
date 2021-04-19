@@ -12,15 +12,15 @@ module.exports = {
     let user = null;
     User.findById(req.params.id).then((foundUser) => {
       errors.inline.badResource(foundUser);
-      if (foundUser.isAdmin) {
-        res.status(200).json({ username: foundUser.username });
-        return;
-      }
       user = foundUser;
       return Pet.find({
         owner: foundUser._id,
       });
     }).then((foundPets) => {
+      if (user.isAdmin) {
+        res.status(200).json({ username: user.username });
+        return;
+      }
       res.status(200).json({
         username: user.username,
         balance: user.balance,

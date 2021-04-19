@@ -4,6 +4,8 @@ const Product = require('../models/Product');
 const Session = require('../models/Session');
 const User = require('../models/User');
 
+const { friendlyProductName } = require('../tools');
+
 module.exports = {
   /** Get all products, optionally filtering them
    * @query filter - (petting|resting|eating|playing)
@@ -41,14 +43,14 @@ module.exports = {
    * @body token
    * @body quantity
    */
-  create: (req, res) => {
+  purchase: (req, res) => {
     let product = null;
     Product.findOne({
-      name: req.params.name.split('-').map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase()).join(''),
+      name: req.params.name,
     }).then((foundProduct) => {
       errors.inline.badResource(foundProduct);
       product = foundProduct;
-      return Session.find({
+      return Session.findOne({
         token: req.body.token,
       });
     }).then((foundSession) => {
@@ -64,9 +66,9 @@ module.exports = {
           category: product.category,
         });
       }
-      foundUser.save();
+      return foundUser.save();
     }).then((updatedUser) => {
-      res.status(201).json({ message: `Successfully purchased ${req.body.quality}x ${product.name}` });
+      res.status(201).json({ message: `Successfully purchased ${req.body.quantity} ${friendlyProductName(product.name)}` });
     }).catch(errors.standard(res));
   },
   /** Make a new product for the store
@@ -77,7 +79,7 @@ module.exports = {
    * @body category
    * @body price
    */
-  createType: (req, res) => {
+  create: (req, res) => {
     Session.findOne({
       token: req.body.token,
     }).then((foundSession) => {

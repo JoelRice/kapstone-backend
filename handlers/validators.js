@@ -49,7 +49,7 @@ const validators = {
     // TODO: FIGURE OUT WHAT IT LOOKS LIKE
   },
   date: (req, res, source, key) => {
-    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/.test(req[source][key])| new Date(req[source][key]).toString() === 'Invalid Date') {
+    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/.test(req[source][key])| new Date(req[source][key]).toString() === 'Invalid Date') {
       res.status(400).json({ error: `Request ${source}.${key} must be a proper Datestring (Use ISO 8601)` });
       return true;
     }

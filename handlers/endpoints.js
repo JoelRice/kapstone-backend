@@ -28,7 +28,7 @@ router.route('/auth/account')
     check.body('password'),
     users.create,
   )
-  // Update your account
+  // Update your account info
   .put(
     check.body('token'),
     check.body('password'),
@@ -61,20 +61,20 @@ router.route('/auth/logout')
 router.route('/admin/product')
   // Create a new product in the store
   .post(
+    multipartForm,
     check.body('token'),
     check.body('name'),
     check.body('pictureData'),
     check.body('quality', 'amount'),
     check.body('category', 'productCategory'),
     check.body('price', 'amount'),
-    products.createType,
+    products.create,
   );
 
 router.route('/admin/pet')
   // Create a new pet
   .post(
     multipartForm,
-    //(req, res, next) => { console.log(req.body); next(); },
     check.body('token'),
     check.body('name'),
     check.body('pictureData'),
@@ -108,7 +108,7 @@ router.route('/auctions/:id')
     check.params('id', 'mongoId'),
     check.body('token'),
     check.body('amount'),
-    auctions.update,
+    auctions.bid,
   );
 
 router.route('/pets')
@@ -150,7 +150,15 @@ router.route('/products/:name')
     check.params('name', 'productName'),
     check.body('token'),
     check.body('quantity', 'amount'),
-    products.create,
+    products.purchase,
+  );
+
+router.route('/interact')
+  .post(
+    check.body('token'),
+    check.body('pet', 'mongoId'),
+    check.body('product', 'productName'),
+    pets.interact,
   );
 
 module.exports = router;
