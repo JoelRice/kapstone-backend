@@ -76,5 +76,8 @@ module.exports = {
     badCredentials: (user) => {
       if (user === null) throw [400, 'Incorrect username or password'];
     },
+    badProduct: (user, product) => {
+      if (!user.inventory.find((p) => p.name === product)) throw [400, 'You do not have this product'];
+    },
   },
 };

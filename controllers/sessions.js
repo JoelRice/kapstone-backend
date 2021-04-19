@@ -2,6 +2,7 @@ const errors = require('../handlers/errors');
 
 const User = require('../models/User');
 const Session = require('../models/Session');
+const Pet = require('../models/Pet');
 
 const tokenGen = require('../tokenGenerator');
 
@@ -10,17 +11,23 @@ module.exports = {
    * @body token
    */
   read: (req, res) => {
+    let user = null;
     Session.findOne({
       token: req.body.token,
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);
-    }).then((user) => {
-      res.status(200).json({
-        username: user.username,
-        balance: user.balance,
-        isAdmin: user.isAdmin,
-      });
+    }).then((foundUser) => {
+      user = {
+        username: foundUser.foundUsername,
+        balance: foundUser.balance,
+        isAdmin: foundUser.isAdmin,
+        inventory: foundUser.inventory.map((item) => item.name),
+      };
+      return Pet.find({ owner: foundUser._id });
+    }).then((foundPets) => {
+      user.pets = foundPets.map((pet) => pet._id);
+      res.status(200).json(user);
     }).catch(errors.standard(res));
   },
   /** Create a session
