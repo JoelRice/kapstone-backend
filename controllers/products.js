@@ -19,7 +19,7 @@ module.exports = {
       let products = foundProducts;
       const sorter = (sortProp, order) => (a, b) => ( (a[sortProp] - b[sortProp]) * (order === 'asc' ? 1 : -1) );
       products.sort(sorter(req.query.sort, req.query.order));
-      res.status(200).json({ products: products.map((product) => product.name) });
+      res.status(200).json(products.map((product) => product.name));
     }).catch(errors.standard(res));
   },
   /** Get an individual product by name
@@ -35,6 +35,7 @@ module.exports = {
         quality: foundProduct.quality,
         price: foundProduct.price,
         category: foundProduct.category,
+		pictureData: foundProduct.pictureData,
       });
     }).catch(errors.standard(res));
   },
