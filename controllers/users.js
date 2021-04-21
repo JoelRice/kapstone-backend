@@ -58,7 +58,7 @@ module.exports = {
    */
   update: (req, res) => {
     Session.findOne({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);
@@ -79,7 +79,7 @@ module.exports = {
    */
   delete: (req, res) => {
     Session.findOne({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);

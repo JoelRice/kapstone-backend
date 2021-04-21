@@ -4,7 +4,7 @@ const exists = (obj, prop) => Object.hasOwnProperty.call(obj, prop);
 const validators = {
   token: (req, res, source, key) => {
     // 6 chars long using only lowercase and numbers: base36
-    if (!/^[a-z0-9]{6}$/.test(req[source][key])) {
+    if (!/^Basic [a-z0-9]{6}$/.test(req[source][key])) {
       res.status(400).json({ error: `Request ${source}.${key} is malformed` });
       return true;
     }
@@ -102,7 +102,7 @@ const validate = (prop, fallback) => (key, type=key) => {
   if (!exists(validators, type)) {
     throw `Validator not implemented for ${type}`;
   }
-  return (req, res, next) => {  
+  return (req, res, next) => {
     if (!exists(req[prop], key)) {
       if (fallback !== undefined) req[prop][key] = fallback;
       else {
@@ -119,6 +119,7 @@ module.exports = {
   body: validate('body'),
   params: validate('params'),
   query: validate('query'),
+  headers: validate('headers'),
   optional: (fallback) => ({
     body: validate('body', fallback),
     params: validate('params', fallback),
