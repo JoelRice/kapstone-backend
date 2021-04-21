@@ -19,6 +19,7 @@ module.exports = {
       return User.findById(foundSession.user);
     }).then((foundUser) => {
       user = {
+		userId: foundUser._id,
         username: foundUser.username,
         balance: foundUser.balance,
         isAdmin: foundUser.isAdmin,
