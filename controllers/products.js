@@ -10,7 +10,7 @@ module.exports = {
   /** Get all products, optionally filtering them
    * @query filter - (petting|resting|eating|playing)
    * @query sort - (quality|price)
-   * @query order - (asc|ascending|desc|descending)
+   * @query order - (asc|desc)
   */
   all: (req, res) => {
     Product.find(
@@ -52,7 +52,7 @@ module.exports = {
       errors.inline.badResource(foundProduct);
       product = foundProduct;
       return Session.findOne({
-        token: req.body.token,
+        token: req.headers.authorization.split(' ')[1],
       });
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
@@ -82,7 +82,7 @@ module.exports = {
    */
   create: (req, res) => {
     Session.findOne({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);

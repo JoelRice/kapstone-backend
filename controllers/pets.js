@@ -50,7 +50,7 @@ module.exports = {
    */
   create: (req, res) => {
     Session.findOne({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);
@@ -89,7 +89,7 @@ module.exports = {
     let product = null;
     let amount = 0;
     Session.findOne({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);

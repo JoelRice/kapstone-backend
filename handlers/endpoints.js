@@ -19,7 +19,7 @@ const { next } = require('../tokenGenerator');
 router.route('/auth/account')
   // Get info about your account
   .get(
-    check.body('token'),
+    check.headers('authorization', 'token'),
     sessions.read,
   )
   // Create a new account
@@ -30,7 +30,7 @@ router.route('/auth/account')
   )
   // Update your account info
   .put(
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('password'),
     check.body('newUsername', 'username'),
     check.body('newPassword', 'password'),
@@ -38,7 +38,7 @@ router.route('/auth/account')
   )
   // Delete your account
   .delete(
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('password'),
     users.delete,
   );
@@ -54,7 +54,7 @@ router.route('/auth/login')
 router.route('/auth/logout')
   // Log out of your account, deleting your session token
   .post(
-    check.body('token'),
+    check.headers('authorization', 'token'),
     sessions.delete,
   );
 
@@ -62,7 +62,7 @@ router.route('/admin/product')
   // Create a new product in the store
   .post(
     multipartForm,
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('name'),
     check.body('pictureData'),
     check.body('quality', 'amount'),
@@ -75,7 +75,7 @@ router.route('/admin/pet')
   // Create a new pet
   .post(
     multipartForm,
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('name'),
     check.body('pictureData'),
     check.body('cuddly', 'amount'),
@@ -91,7 +91,7 @@ router.route('/auctions')
     auctions.all,
   )
   .post(
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('pet', 'mongoId'),
     check.body('endsAt', 'date'),
     auctions.create,
@@ -106,7 +106,7 @@ router.route('/auctions/:id')
   // Place a bid on an auction
   .post(
     check.params('id', 'mongoId'),
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('amount'),
     auctions.bid,
   );
@@ -148,14 +148,14 @@ router.route('/products/:name')
   )
   .post(
     check.params('name', 'productName'),
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('quantity', 'amount'),
     products.purchase,
   );
 
 router.route('/interact')
   .post(
-    check.body('token'),
+    check.headers('authorization', 'token'),
     check.body('pet', 'mongoId'),
     check.body('product', 'productName'),
     pets.interact,

@@ -13,7 +13,7 @@ module.exports = {
   read: (req, res) => {
     let user = null;
     Session.findOne({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((foundSession) => {
       errors.inline.badToken(foundSession);
       return User.findById(foundSession.user);
@@ -54,7 +54,7 @@ module.exports = {
    */
   delete: (req, res) => {
     Session.findOneAndDelete({
-      token: req.body.token,
+      token: req.headers.authorization.split(' ')[1],
     }).then((deletedSession) => {
       errors.inline.badToken(deletedSession);
       res.status(200).json({ message: 'Successfully logged out' });
