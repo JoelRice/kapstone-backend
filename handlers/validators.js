@@ -4,7 +4,7 @@ const exists = (obj, prop) => Object.hasOwnProperty.call(obj, prop);
 const validators = {
   token: (req, res, source, key) => {
     // 6 chars long using only lowercase and numbers: base36
-    if (!/^Basic [a-z0-9]{6}$/.test(req[source][key])) {
+    if (!/^Bearer [a-z0-9]{6}$/.test(req[source][key])) {
       res.status(400).json({ error: `Request ${source}.${key} is malformed` });
       return true;
     }
