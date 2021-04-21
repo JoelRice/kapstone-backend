@@ -19,7 +19,7 @@ module.exports = {
       return User.findById(foundSession.user);
     }).then((foundUser) => {
       user = {
-        username: foundUser.foundUsername,
+        username: foundUser.username,
         balance: foundUser.balance,
         isAdmin: foundUser.isAdmin,
         inventory: foundUser.inventory.map((item) => item.name),
