@@ -73,10 +73,7 @@ module.exports = {
       return User.findById(foundSession.user);
     }).then((foundUser) => {
       errors.inline.badBalance(foundUser, req.body.amount);
-      foundUser.balance -= req.body.amount;
-      return foundUser.save();
-    }).then((updatedUser) => {
-      userId = updatedUser._id;
+      userId = foundUser._id;
       return Auction.findById(req.params.id);
     }).then((foundAuction) => {
       errors.inline.badResource(foundAuction);
@@ -97,8 +94,15 @@ module.exports = {
     let winner = null;
     Auction.findByIdAndDelete(req.params.id).then((deletedAuction) => {
       auction = deletedAuction;
-      winner = deletedAuction.bids.reduce(
-        (highest, bid) => bid.amount > highest.amount ? bid : highest,
+      auction.bids.sort((bid1, bid2) => bid2.amount - bid1.amount)
+      return User.find();
+    }).then((allUsers) => {
+      const userDict = {};
+      allUsers.forEach((u) => {
+        userDict[u._id] = {username: u.username, balance: u.balance};
+      });
+      winner = auction.bids.reduce(
+        (highest, bid) => (bid.amount > highest.amount && bid.amount <= userDict[bid.user].balance) ? bid : highest,
         { user: null, amount: 0 }
       );
       if (winner.user === null) {
@@ -109,7 +113,12 @@ module.exports = {
           timeouts.schedule('auction', createdAuction);
         });
         throw [200, 'Failed to close auction, no one has bid. It has been extended by 6 hours.'];
-      }      
+      }
+      return User.findById(winner.user);
+    }).then((foundWinner) => {
+      foundWinner.balance -= winner.amount;
+      return foundWinner.save();
+    }).then((savedWinner) => {
       return User.findById(auction.pet.owner);
     }).then((foundOwner) => {
       if (foundOwner !== null) {
@@ -120,7 +129,7 @@ module.exports = {
     }).then((updatedOwner) => {
       return Pet.findByIdAndUpdate(auction.pet, { owner: winner.user });
     }).then((updatedPet) => {
-      res.status(200).json({ message: 'Auction closed successfully' });
+      res.status(200).json({ message: `Auction closed successfully, ${winner.user} won for ${winner.amount}` });
     }).catch(errors.standard(res));
   },
 };
